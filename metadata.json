@@ -1,0 +1,8 @@
+{
+  "name": "Nexus Inventory Management System",
+  "description": "A comprehensive, full-stack inventory management system featuring stock tracking, supplier and customer portals, purchase orders, sales billing, automated stock ledgers, and reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

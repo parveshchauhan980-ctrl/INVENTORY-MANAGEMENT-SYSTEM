@@ -1,0 +1,200 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile and role assignment",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth UID" },
+        "name": { "type": "string", "description": "Display name" },
+        "email": { "type": "string", "description": "User email address" },
+        "role": { "type": "string", "enum": ["admin", "staff"], "description": "Role in the system" },
+        "phone": { "type": "string", "description": "Contact number" },
+        "status": { "type": "string", "enum": ["active", "inactive"], "description": "Account status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category grouping",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Category name" },
+        "code": { "type": "string", "description": "Unique category code" },
+        "description": { "type": "string", "description": "Category description" },
+        "color": { "type": "string", "description": "Hex color code" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["name", "code"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Supplier and vendor details",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Company name" },
+        "contactPerson": { "type": "string", "description": "Primary contact name" },
+        "email": { "type": "string", "description": "Email address" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "address": { "type": "string", "description": "Physical address" },
+        "taxId": { "type": "string", "description": "Tax / GSTIN identifier" },
+        "outstandingBalance": { "type": "number", "description": "Accounts payable balance" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["name", "phone"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer and client profile",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Customer or business name" },
+        "email": { "type": "string", "description": "Email address" },
+        "phone": { "type": "string", "description": "Contact phone" },
+        "address": { "type": "string", "description": "Billing address" },
+        "customerType": { "type": "string", "enum": ["retail", "wholesale"], "description": "Classification" },
+        "outstandingBalance": { "type": "number", "description": "Accounts receivable balance" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["name", "phone"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Catalog item with pricing and stock level",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Product title" },
+        "sku": { "type": "string", "description": "Unique Stock Keeping Unit" },
+        "barcode": { "type": "string", "description": "Barcode identifier" },
+        "brand": { "type": "string", "description": "Manufacturer brand" },
+        "categoryId": { "type": "string", "description": "Category document ID" },
+        "unit": { "type": "string", "description": "Unit of measurement" },
+        "purchasePrice": { "type": "number", "description": "Cost per unit" },
+        "sellingPrice": { "type": "number", "description": "Retail price per unit" },
+        "quantity": { "type": "number", "description": "Available stock quantity" },
+        "minStock": { "type": "number", "description": "Low-stock alert threshold" },
+        "location": { "type": "string", "description": "Shelf / warehouse location" },
+        "description": { "type": "string", "description": "Product description" },
+        "status": { "type": "string", "enum": ["in_stock", "low_stock", "out_of_stock"], "description": "Stock state" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["name", "sku", "categoryId", "purchasePrice", "sellingPrice", "quantity", "minStock"]
+    },
+    "Purchase": {
+      "title": "Purchase",
+      "description": "Purchase order from a supplier",
+      "type": "object",
+      "properties": {
+        "purchaseNumber": { "type": "string", "description": "Unique PO reference" },
+        "supplierId": { "type": "string", "description": "Supplier ID" },
+        "supplierName": { "type": "string", "description": "Supplier display name" },
+        "date": { "type": "string", "format": "date", "description": "Order date" },
+        "status": { "type": "string", "enum": ["received", "pending", "cancelled"], "description": "PO status" },
+        "paymentStatus": { "type": "string", "enum": ["paid", "partial", "pending"], "description": "Payment status" },
+        "paymentMethod": { "type": "string", "description": "Payment mode" },
+        "subtotal": { "type": "number", "description": "Items subtotal" },
+        "taxAmount": { "type": "number", "description": "Tax / shipping amount" },
+        "discountAmount": { "type": "number", "description": "Discount" },
+        "totalAmount": { "type": "number", "description": "Final total cost" },
+        "notes": { "type": "string", "description": "Order notes" },
+        "createdBy": { "type": "string", "description": "Staff or Admin who recorded order" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["purchaseNumber", "supplierId", "date", "totalAmount"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Customer sales invoice",
+      "type": "object",
+      "properties": {
+        "invoiceNumber": { "type": "string", "description": "Unique invoice reference" },
+        "customerId": { "type": "string", "description": "Customer ID or empty for walk-in" },
+        "customerName": { "type": "string", "description": "Customer billed name" },
+        "date": { "type": "string", "format": "date", "description": "Invoice date" },
+        "status": { "type": "string", "enum": ["completed", "pending", "cancelled"], "description": "Invoice state" },
+        "paymentStatus": { "type": "string", "enum": ["paid", "pending"], "description": "Payment state" },
+        "paymentMethod": { "type": "string", "description": "Payment method" },
+        "subtotal": { "type": "number", "description": "Subtotal" },
+        "taxRate": { "type": "number", "description": "GST rate percentage" },
+        "taxAmount": { "type": "number", "description": "GST amount" },
+        "discountAmount": { "type": "number", "description": "Discount applied" },
+        "totalAmount": { "type": "number", "description": "Grand total" },
+        "notes": { "type": "string", "description": "Notes" },
+        "createdBy": { "type": "string", "description": "Staff or Admin who billed invoice" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["invoiceNumber", "customerName", "date", "totalAmount"]
+    },
+    "StockLog": {
+      "title": "StockLog",
+      "description": "Inventory movement audit log",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string", "description": "Product document ID" },
+        "type": { "type": "string", "enum": ["purchase", "sale", "adjustment_in", "adjustment_out", "damage", "return"], "description": "Movement classification" },
+        "quantityChange": { "type": "number", "description": "Quantity change delta" },
+        "previousQuantity": { "type": "number", "description": "Balance before operation" },
+        "newQuantity": { "type": "number", "description": "Balance after operation" },
+        "reason": { "type": "string", "description": "Audit justification" },
+        "referenceId": { "type": "string", "description": "PO / INV / ADJ reference number" },
+        "userName": { "type": "string", "description": "Operator user name" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["productId", "type", "quantityChange", "previousQuantity", "newQuantity"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "System configuration key-value entry",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string", "description": "Config key" },
+        "value": { "type": "string", "description": "Config value" }
+      },
+      "required": ["key", "value"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile records"
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Admin authorization marker documents"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Product category taxonomy"
+    },
+    "/suppliers/{supplierId}": {
+      "schema": { "$ref": "#/entities/Supplier" },
+      "description": "Supplier contacts and purchasing info"
+    },
+    "/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Customer directory records"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Inventory products catalog"
+    },
+    "/purchases/{purchaseId}": {
+      "schema": { "$ref": "#/entities/Purchase" },
+      "description": "Supplier purchase orders"
+    },
+    "/sales/{saleId}": {
+      "schema": { "$ref": "#/entities/Sale" },
+      "description": "Sales billing invoices"
+    },
+    "/stock_logs/{logId}": {
+      "schema": { "$ref": "#/entities/StockLog" },
+      "description": "Stock audit movement history ledger"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/Setting" },
+      "description": "Company and tax configuration"
+    }
+  }
+}
