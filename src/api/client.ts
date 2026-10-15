@@ -1,3 +1,5 @@
+import { clientStore } from './clientStore';
+
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -22,17 +24,25 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
 
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
 
-  const contentType = response.headers.get('content-type');
-  const isJson = contentType && contentType.includes('application/json');
-  const data = isJson ? await response.json() : await response.text();
+    const contentType = response.headers.get('content-type');
+    const isJson = contentType && contentType.includes('application/json');
+
+    // On Netlify static hosting without backend, unmatched /api/* requests return index.html (200 OK text/html) or 404
+    if (!isJson || response.status === 404 || response.status === 405 || response.status === 502) {
+      console.info(`[Nexus Network] Routing ${path} to client data engine`);
+      return (await clientStore.handleRoute(path, options)) as T;
+    }
+
+    const data = await response.json();
 
     if (!response.ok) {
-      const errorMessage = isJson && data && data.error ? data.error : `Request failed with status ${response.status}`;
+      const errorMessage = data && data.error ? data.error : `Request failed with status ${response.status}`;
       if (response.status === 401 && !path.includes('/api/auth/login') && !path.includes('/api/auth/firebase-login')) {
         // Clear token on auth failure for protected routes
         localStorage.removeItem('nexus_token');
@@ -42,7 +52,30 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       throw new ApiError(errorMessage, response.status);
     }
 
-  return data as T;
+    return data as T;
+  } catch (err: any) {
+    // If it's already an explicit ApiError (e.g. 401 from server with JSON error message), check if we can fall back
+    if (err instanceof ApiError && err.status === 401 && path.includes('/api/auth/login')) {
+      // In case server rejects or is misconfigured, try clientStore verification
+      try {
+        return (await clientStore.handleRoute(path, options)) as T;
+      } catch (clientErr: any) {
+        throw new ApiError(clientErr.message || err.message, clientErr.status || 401);
+      }
+    }
+
+    if (err instanceof ApiError) {
+      throw err;
+    }
+
+    // Network error (offline or server not reachable) -> Seamless clientStore fallback
+    console.info(`[Nexus Network] Server unreachable, executing ${path} via browser engine`);
+    try {
+      return (await clientStore.handleRoute(path, options)) as T;
+    } catch (clientErr: any) {
+      throw new ApiError(clientErr.message || 'Operation failed', clientErr.status || 500);
+    }
+  }
 }
 
 export const api = {

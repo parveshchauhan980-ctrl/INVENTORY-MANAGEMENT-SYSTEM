@@ -102,6 +102,7 @@ export interface Purchase {
   created_by?: string;
   created_at?: string;
   total_items?: number;
+  items?: PurchaseItem[];
 }
 
 export interface SaleItem {
@@ -119,7 +120,7 @@ export interface SaleItem {
 export interface Sale {
   id: number;
   invoice_number: string;
-  customer_id?: number;
+  customer_id?: number | null;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;
@@ -138,6 +139,7 @@ export interface Sale {
   created_by?: string;
   created_at?: string;
   total_items?: number;
+  items?: SaleItem[];
 }
 
 export interface StockLog {
@@ -147,7 +149,7 @@ export interface StockLog {
   sku: string;
   unit?: string;
   category_name?: string;
-  type: 'purchase' | 'sale' | 'adjustment_in' | 'adjustment_out' | 'damage' | 'return';
+  type: 'purchase' | 'sale' | 'adjustment_in' | 'adjustment_out' | 'damage' | 'return' | 'initial_stock';
   quantity_change: number;
   previous_quantity: number;
   new_quantity: number;

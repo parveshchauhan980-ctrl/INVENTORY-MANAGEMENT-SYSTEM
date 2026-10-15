@@ -11,6 +11,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAdmin: boolean;
   isFirebaseConnected: boolean;
+  register: (name: string, email: string, password: string, role?: 'admin' | 'staff') => Promise<void>;
+  resetPassword: (email: string) => Promise<{ message: string; tempPassword?: string }>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => void;
@@ -76,8 +78,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       const res = await api.get<{ user: User }>('/api/auth/me');
-      setUser(res.user);
-      localStorage.setItem('nexus_user', JSON.stringify(res.user));
+      if (res && res.user) {
+        setUser(res.user);
+        localStorage.setItem('nexus_user', JSON.stringify(res.user));
+      }
     } catch (err: any) {
       if (err?.status === 401) {
         localStorage.removeItem('nexus_token');
@@ -95,14 +99,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token]);
 
   const login = async (email: string, password: string) => {
+    // Attempt backend/clientStore authentication first for instant admin verification
     const res = await api.post<{ message: string; token: string; user: User }>('/api/auth/login', {
       email,
       password
     });
-    localStorage.setItem('nexus_token', res.token);
+    if (!res || !res.user) {
+      throw new Error('Authentication response was invalid.');
+    }
+    const authToken = res.token || 'nexus_jwt_token_admin';
+    localStorage.setItem('nexus_token', authToken);
     localStorage.setItem('nexus_user', JSON.stringify(res.user));
-    setToken(res.token);
+    setToken(authToken);
     setUser(res.user);
+  };
+
+  const register = async (name: string, email: string, password: string, role: 'admin' | 'staff' = 'staff') => {
+    const res = await api.post<{ message: string; token: string; user: User }>('/api/auth/register', {
+      name,
+      email,
+      password,
+      role
+    });
+    if (!res || !res.user) {
+      throw new Error('Registration failed.');
+    }
+    const authToken = res.token || `nexus_jwt_token_${res.user.id}`;
+    localStorage.setItem('nexus_token', authToken);
+    localStorage.setItem('nexus_user', JSON.stringify(res.user));
+    setToken(authToken);
+    setUser(res.user);
+  };
+
+  const resetPassword = async (email: string): Promise<{ message: string; tempPassword?: string }> => {
+    const res = await api.post<{ message: string; tempPassword?: string }>('/api/auth/forgot-password', {
+      email
+    });
+    return res;
   };
 
   const loginWithGoogle = async () => {
@@ -150,6 +183,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin: user?.role === 'admin',
         isFirebaseConnected,
         login,
+        register,
+        resetPassword,
         loginWithGoogle,
         logout,
         refreshUser
