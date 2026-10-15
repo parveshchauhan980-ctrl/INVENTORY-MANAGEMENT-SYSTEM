@@ -53,7 +53,7 @@ service cloud.firestore {
     match /suppliers/{supplierId} {
       allow read: if isSignedIn();
       allow write: if isSignedIn();
-    }
+    }u
 
     // Customers
     match /customers/{customerId} {
