@@ -49,8 +49,10 @@ function MainApp() {
       if (setRes && setRes.settings && setRes.settings.currency) {
         setCurrencySymbol(setRes.settings.currency);
       }
-    } catch (err) {
-      console.warn('Failed fetching background alerts:', err);
+    } catch (err: any) {
+      if (err?.status !== 401) {
+        console.warn('Failed fetching background alerts:', err);
+      }
     }
   };
 

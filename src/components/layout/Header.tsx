@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
     customers: { title: 'Customer Records', subtitle: 'Directory of retail & wholesale buyers with purchase history' },
     reports: { title: 'Reports & P&L Analytics', subtitle: 'Financial performance, inventory valuation, and margin calculations' },
     users: { title: 'Staff & Role Permissions', subtitle: 'Manage administrator and staff member access levels' },
-    settings: { title: 'System Configuration', subtitle: 'Company header, GST/Tax rates, currency, and presentation reset' }
+    settings: { title: 'System Configuration', subtitle: 'Company profile, GST/Tax rates, and currency parameters' }
   };
 
   const currentMeta = titles[currentTab] || { title: 'Inventory Management', subtitle: 'System Control' };

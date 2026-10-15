@@ -45,8 +45,10 @@ export const DashboardPage: React.FC<DashboardProps> = ({
       setLoading(true);
       const res = await api.get<any>('/api/dashboard/summary');
       setData(res);
-    } catch (err) {
-      console.error('Error fetching dashboard summary:', err);
+    } catch (err: any) {
+      if (err?.status !== 401) {
+        console.error('Error fetching dashboard summary:', err);
+      }
     } finally {
       setLoading(false);
     }

@@ -55,6 +55,64 @@ authRouter.post('/login', (req: Request, res: Response) => {
   });
 });
 
+// Firebase user authentication & token exchange
+authRouter.post('/firebase-login', (req: Request, res: Response) => {
+  const { email, name, phone } = req.body;
+
+  if (!email) {
+    res.status(400).json({ error: 'Email is required for Firebase authentication.' });
+    return;
+  }
+
+  let user = dbQueryOne<{ id: number; name: string; email: string; role: 'admin' | 'staff'; status: string; phone: string }>(
+    'SELECT id, name, email, role, status, phone FROM users WHERE LOWER(email) = LOWER(?)',
+    [email.trim()]
+  );
+
+  if (!user) {
+    const isOwner = email.trim().toLowerCase() === 'parveshchauhan980@gmail.com' || email.trim().toLowerCase().includes('admin');
+    const role: 'admin' | 'staff' = isOwner ? 'admin' : 'staff';
+    const displayName = name && name.trim() ? name.trim() : email.split('@')[0];
+    const dummyPasswordHash = bcrypt.hashSync('firebase_auth_' + Date.now(), 10);
+    const insertRes = dbExecute(
+      'INSERT INTO users (name, email, password, role, phone, status) VALUES (?, ?, ?, ?, ?, ?)',
+      [displayName, email.trim(), dummyPasswordHash, role, phone ? phone.trim() : null, 'active']
+    );
+    user = {
+      id: insertRes.lastInsertRowid,
+      name: displayName,
+      email: email.trim(),
+      role,
+      status: 'active',
+      phone: phone ? phone.trim() : ''
+    };
+  }
+
+  if (user.status !== 'active') {
+    res.status(403).json({ error: 'Account is deactivated. Contact an administrator.' });
+    return;
+  }
+
+  const token = generateToken({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+  });
+
+  res.json({
+    message: 'Firebase login successful',
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone
+    }
+  });
+});
+
 // Current user profile
 authRouter.get('/me', authenticate, (req: Request, res: Response) => {
   const user = dbQueryOne<{ id: number; name: string; email: string; role: 'admin' | 'staff'; phone: string; created_at: string }>(

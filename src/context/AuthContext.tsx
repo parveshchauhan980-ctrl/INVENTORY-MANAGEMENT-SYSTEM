@@ -34,24 +34,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsFirebaseConnected(connected);
     });
 
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
-      if (fbUser && !user) {
-        // If logged in via Firebase Google Auth
-        const newUser: User = {
-          id: 999,
-          name: fbUser.displayName || fbUser.email?.split('@')[0] || 'Firebase User',
-          email: fbUser.email || 'user@firebase.com',
-          role: fbUser.email === 'parveshchauhan980@gmail.com' ? 'admin' : 'staff',
-          phone: fbUser.phoneNumber || undefined,
-          status: 'active'
-        };
-        setUser(newUser);
-        localStorage.setItem('nexus_user', JSON.stringify(newUser));
-        // Use a persistent demo token for API calls
-        if (!localStorage.getItem('nexus_token')) {
-          localStorage.setItem('nexus_token', 'firebase_oauth_token');
-          setToken('firebase_oauth_token');
+      if (fbUser) {
+        try {
+          const res = await api.post<{ token: string; user: User }>('/api/auth/firebase-login', {
+            email: fbUser.email,
+            name: fbUser.displayName,
+            phone: fbUser.phoneNumber
+          });
+          localStorage.setItem('nexus_token', res.token);
+          localStorage.setItem('nexus_user', JSON.stringify(res.user));
+          setToken(res.token);
+          setUser(res.user);
+          setIsLoading(false);
+        } catch (syncErr) {
+          console.warn('Firebase login sync fallback:', syncErr);
         }
       }
     });
@@ -59,6 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleUnauthorized = () => {
       setUser(null);
       setToken(null);
+      localStorage.removeItem('nexus_token');
+      localStorage.removeItem('nexus_user');
     };
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);
@@ -69,7 +69,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const refreshUser = async () => {
-    if (!token || token === 'firebase_oauth_token') {
+    if (!token) {
+      setUser(null);
       setIsLoading(false);
       return;
     }
@@ -77,8 +78,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.get<{ user: User }>('/api/auth/me');
       setUser(res.user);
       localStorage.setItem('nexus_user', JSON.stringify(res.user));
-    } catch (err) {
-      console.warn('Failed to refresh user profile:', err);
+    } catch (err: any) {
+      if (err?.status === 401) {
+        localStorage.removeItem('nexus_token');
+        localStorage.removeItem('nexus_user');
+        setUser(null);
+        setToken(null);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -102,29 +108,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const fbUser = result.user;
-    const isOwnerAdmin = fbUser.email === 'parveshchauhan980@gmail.com';
-    const googleUser: User = {
-      id: 999,
-      name: fbUser.displayName || 'Google User',
-      email: fbUser.email || '',
-      role: isOwnerAdmin ? 'admin' : 'staff',
-      phone: fbUser.phoneNumber || undefined,
-      status: 'active'
-    };
-    setUser(googleUser);
-    localStorage.setItem('nexus_user', JSON.stringify(googleUser));
-    // Fetch a real backend token for the admin user so all backend APIs work seamlessly
-    try {
-      const loginRes = await api.post<{ token: string }>('/api/auth/login', {
-        email: 'admin@inventory.com',
-        password: 'admin123'
-      });
-      localStorage.setItem('nexus_token', loginRes.token);
-      setToken(loginRes.token);
-    } catch {
-      localStorage.setItem('nexus_token', 'firebase_token');
-      setToken('firebase_token');
-    }
+    const res = await api.post<{ token: string; user: User }>('/api/auth/firebase-login', {
+      email: fbUser.email,
+      name: fbUser.displayName,
+      phone: fbUser.phoneNumber
+    });
+    localStorage.setItem('nexus_token', res.token);
+    localStorage.setItem('nexus_user', JSON.stringify(res.user));
+    setToken(res.token);
+    setUser(res.user);
   };
 
   const logout = () => {

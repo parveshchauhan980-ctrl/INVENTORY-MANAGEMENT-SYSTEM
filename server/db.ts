@@ -261,11 +261,22 @@ async function initializeSchema(db: Database) {
   const userCheck = dbQueryOne<{ count: number }>('SELECT COUNT(*) as count FROM users');
   if (!userCheck || userCheck.count === 0) {
     await seedInitialData(db);
+  } else {
+    // Ensure primary admin account exists
+    const ownerCheck = dbQueryOne<{ id: number }>('SELECT id FROM users WHERE LOWER(email) = LOWER(?)', ['parveshchauhan980@gmail.com']);
+    if (!ownerCheck) {
+      const salt = bcrypt.genSaltSync(10);
+      const adminPassword = bcrypt.hashSync('admin123', salt);
+      db.run(
+        `INSERT INTO users (name, email, password, role, phone, status) VALUES ('Parvesh Chauhan', 'parveshchauhan980@gmail.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active');`
+      );
+      saveDatabase();
+    }
   }
 }
 
 export async function seedInitialData(db: Database) {
-  console.log('Seeding initial demo data...');
+  console.log('Seeding initial data...');
   const salt = bcrypt.genSaltSync(10);
   const adminPassword = bcrypt.hashSync('admin123', salt);
   const staffPassword = bcrypt.hashSync('staff123', salt);
@@ -273,8 +284,9 @@ export async function seedInitialData(db: Database) {
   // Users
   db.run(`
     INSERT INTO users (name, email, password, role, phone) VALUES
-    ('Parvesh Chauhan (Admin)', 'admin@inventory.com', '${adminPassword}', 'admin', '+91 98765 43210'),
-    ('Rahul Sharma (Staff)', 'staff@inventory.com', '${staffPassword}', 'staff', '+91 98123 45678');
+    ('Parvesh Chauhan', 'admin@inventory.com', '${adminPassword}', 'admin', '+91 98765 43210'),
+    ('Parvesh Chauhan', 'parveshchauhan980@gmail.com', '${adminPassword}', 'admin', '+91 98765 43210'),
+    ('Rahul Sharma', 'staff@inventory.com', '${staffPassword}', 'staff', '+91 98123 45678');
   `);
 
   // Settings
