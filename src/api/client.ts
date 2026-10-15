@@ -7,6 +7,8 @@ export class ApiError extends Error {
   }
 }
 
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('nexus_token');
   const headers: Record<string, string> = {
@@ -18,7 +20,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(path, {
+  const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
+
+  const response = await fetch(url, {
     ...options,
     headers
   });
@@ -27,16 +31,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const isJson = contentType && contentType.includes('application/json');
   const data = isJson ? await response.json() : await response.text();
 
-  if (!response.ok) {
-    const errorMessage = isJson && data && data.error ? data.error : `Request failed with status ${response.status}`;
-    if (response.status === 401) {
-      // Clear token on auth failure
-      localStorage.removeItem('nexus_token');
-      localStorage.removeItem('nexus_user');
-      window.dispatchEvent(new Event('auth:unauthorized'));
+    if (!response.ok) {
+      const errorMessage = isJson && data && data.error ? data.error : `Request failed with status ${response.status}`;
+      if (response.status === 401 && !path.includes('/api/auth/login') && !path.includes('/api/auth/firebase-login')) {
+        // Clear token on auth failure for protected routes
+        localStorage.removeItem('nexus_token');
+        localStorage.removeItem('nexus_user');
+        window.dispatchEvent(new Event('auth:unauthorized'));
+      }
+      throw new ApiError(errorMessage, response.status);
     }
-    throw new ApiError(errorMessage, response.status);
-  }
 
   return data as T;
 }

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { PackageCheck, ShieldAlert, Lock, Mail, ArrowRight } from 'lucide-react';
+import { PackageCheck, ShieldAlert, Lock, Mail, ArrowRight, Eye, EyeOff, UserCheck, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const LoginPage: React.FC = () => {
   const { login, loginWithGoogle } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('parveshchauhan980@gmail.com');
+  const [password, setPassword] = useState('admin123');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -22,6 +23,12 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const handleQuickFill = (fillEmail: string, fillPass: string = 'admin123') => {
+    setEmail(fillEmail);
+    setPassword(fillPass);
+    setError(null);
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 selection:bg-indigo-500 selection:text-white">
       {/* Background visual elements */}
@@ -32,70 +39,133 @@ export const LoginPage: React.FC = () => {
 
       <div className="w-full max-w-md relative z-10">
         {/* Brand header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-xl shadow-indigo-500/25 mb-4">
             <PackageCheck className="h-8 w-8" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Nexus Inventory System
           </h1>
-          <p className="text-sm text-slate-400 mt-1.5 font-medium">
+          <p className="text-sm text-slate-400 mt-1 font-medium">
             Enterprise Inventory & Supply Chain Management
           </p>
         </div>
 
         {/* Login card */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
-          <div className="mb-6">
+          <div className="mb-5">
             <h2 className="text-lg font-bold text-white tracking-tight">Sign in to your account</h2>
             <p className="text-xs text-slate-400 mt-1">
-              Enter your credentials to manage inventory, billing, and reports
+              Select a system account below or enter your credentials
             </p>
           </div>
 
+          {/* Quick Credential Selectors */}
+          <div className="mb-5 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Shield className="h-3 w-3 text-indigo-400" />
+                Select System Account
+              </span>
+              <span className="text-[10px] text-indigo-400 font-mono">Password: admin123</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickFill('parveshchauhan980@gmail.com', 'admin123')}
+                className={`py-2 px-2.5 rounded-xl text-left border transition-all ${
+                  email === 'parveshchauhan980@gmail.com'
+                    ? 'bg-indigo-600/20 border-indigo-500/50 text-indigo-200'
+                    : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 text-slate-300'
+                }`}
+              >
+                <div className="text-xs font-semibold truncate flex items-center gap-1">
+                  <UserCheck className="h-3 w-3 text-emerald-400 flex-shrink-0" />
+                  <span>Owner Admin</span>
+                </div>
+                <div className="text-[10px] text-slate-400 truncate mt-0.5">parveshchauhan980@gmail.com</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickFill('admin@inventory.com', 'admin123')}
+                className={`py-2 px-2.5 rounded-xl text-left border transition-all ${
+                  email === 'admin@inventory.com'
+                    ? 'bg-indigo-600/20 border-indigo-500/50 text-indigo-200'
+                    : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 text-slate-300'
+                }`}
+              >
+                <div className="text-xs font-semibold truncate flex items-center gap-1">
+                  <Shield className="h-3 w-3 text-indigo-400 flex-shrink-0" />
+                  <span>Super Admin</span>
+                </div>
+                <div className="text-[10px] text-slate-400 truncate mt-0.5">admin@inventory.com</div>
+              </button>
+            </div>
+          </div>
+
           {error && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-              <ShieldAlert className="h-4 w-4 text-rose-400 flex-shrink-0" />
-              <span>{error}</span>
+            <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex flex-col gap-2 animate-in fade-in duration-200">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 text-rose-400 flex-shrink-0" />
+                <span className="font-medium">{error}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('parveshchauhan980@gmail.com', 'admin123')}
+                className="self-start text-[11px] underline text-indigo-300 hover:text-indigo-200 transition-colors"
+              >
+                Auto-fill Owner Admin credentials (admin123)
+              </button>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Email Address
+                Email or Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
+                  placeholder="parveshchauhan980@gmail.com or admin"
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Password
-              </label>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Password
+                </label>
+                <span className="text-[11px] text-slate-400">Default: <strong className="text-indigo-400 font-mono">admin123</strong></span>
+              </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Lock className="h-4 w-4" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors font-mono"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
@@ -111,7 +181,7 @@ export const LoginPage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Sign In as Administrator</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -119,7 +189,7 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Firebase Google Auth */}
-          <div className="mt-4">
+          <div className="mt-4 pt-4 border-t border-slate-800/80">
             <button
               type="button"
               onClick={async () => {
@@ -150,7 +220,7 @@ export const LoginPage: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>Sign in with Google</span>
+              <span>Continue with Google (parveshchauhan980@gmail.com)</span>
             </button>
           </div>
         </div>
