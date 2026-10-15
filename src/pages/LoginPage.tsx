@@ -108,7 +108,7 @@ export const LoginPage: React.FC = () => {
     } catch (err: any) {
       console.warn('Google sign-in attempt:', err);
       try {
-        await login('parveshchauhan980@gmail.com', 'admin123');
+        await login('yusufskh67589@gmail.com', 'Yusuf2004');
         setSuccessMessage('Authentication verified. Launching dashboard...');
       } catch (fbErr: any) {
         setError(fbErr.message || 'Google sign in unavailable in current browser frame.');
@@ -654,14 +654,14 @@ export const LoginPage: React.FC = () => {
                 <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
                   <p className="font-semibold">{resetStatus.message}</p>
                   <p className="mt-1 text-slate-600">
-                    Emergency default password: <strong className="font-mono text-emerald-700">admin123</strong>
+                    Emergency default password: <strong className="font-mono text-emerald-700">Yusuf2004</strong>
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     setShowForgotPassword(false);
-                    setPassword('admin123');
+                    setPassword('Yusuf2004');
                     setResetStatus({ type: 'idle', message: '' });
                   }}
                   className="w-full py-2.5 px-4 bg-[#2563EB] text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors cursor-pointer"
@@ -686,7 +686,7 @@ export const LoginPage: React.FC = () => {
                     required
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="parveshchauhan980@gmail.com"
+                    placeholder="yusufskh67589@gmail.com"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>

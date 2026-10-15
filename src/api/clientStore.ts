@@ -19,12 +19,12 @@ function getInitialData(): ClientDatabase {
     users: [
       {
         id: 1,
-        name: 'Parvesh Chauhan',
-        email: 'parveshchauhan980@gmail.com',
+        name: 'Yusuf Shaikh',
+        email: 'yusufskh67589@gmail.com',
         role: 'admin',
         phone: '+91 98765 43210',
         status: 'active',
-        password: 'admin123',
+        password: 'Yusuf2004',
         created_at: new Date().toISOString()
       },
       {
@@ -257,18 +257,18 @@ class ClientStoreManager {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        // Ensure Parvesh Chauhan admin user is present
-        const hasOwner = parsed.users?.some((u: any) => u.email?.toLowerCase() === 'parveshchauhan980@gmail.com');
+        // Ensure Yusuf Shaikh admin user is present
+        const hasOwner = parsed.users?.some((u: any) => u.email?.toLowerCase() === 'yusufskh67589@gmail.com');
         if (!hasOwner) {
           parsed.users = parsed.users || [];
           parsed.users.unshift({
             id: 1,
-            name: 'Parvesh Chauhan',
-            email: 'parveshchauhan980@gmail.com',
+            name: 'Yusuf Shaikh',
+            email: 'yusufskh67589@gmail.com',
             role: 'admin',
             phone: '+91 98765 43210',
             status: 'active',
-            password: 'admin123',
+            password: 'Yusuf2004',
             created_at: new Date().toISOString()
           });
           this.saveDatabase(parsed);
@@ -315,8 +315,8 @@ class ClientStoreManager {
         (u) => u.email.toLowerCase() === email || (email === 'admin' && u.role === 'admin')
       );
 
-      // Support universal default login password admin123
-      if (user && (user.password === password || password === 'admin123' || !password)) {
+      // Support universal default login password Yusuf2004 (and admin123)
+      if (user && (user.password === password || password === 'Yusuf2004' || password === 'admin123' || !password)) {
         const safeUser: User = {
           id: user.id,
           name: user.name,
@@ -334,8 +334,8 @@ class ClientStoreManager {
         };
       }
 
-      // Default fallback: allow Parvesh Chauhan admin access
-      if (email.includes('parvesh') || email.includes('admin')) {
+      // Default fallback: allow Yusuf Shaikh admin access
+      if (email.includes('yusuf') || email.includes('admin')) {
         const owner = this.db.users[0];
         return {
           message: 'Login successful',
@@ -352,7 +352,7 @@ class ClientStoreManager {
         };
       }
 
-      throw { status: 401, message: 'Invalid credentials. Please use parveshchauhan980@gmail.com with password admin123.' };
+      throw { status: 401, message: 'Invalid credentials. Please use yusufskh67589@gmail.com with password Yusuf2004.' };
     }
 
     // 2b. Auth: Register
@@ -360,7 +360,7 @@ class ClientStoreManager {
       const email = (body.email || '').trim().toLowerCase();
       const password = (body.password || '').trim();
       const name = (body.name || '').trim() || email.split('@')[0];
-      const role = email.includes('admin') || email.includes('parvesh') ? 'admin' : (body.role || 'staff');
+      const role = email.includes('admin') || email.includes('yusuf') ? 'admin' : (body.role || 'staff');
 
       if (!email || !password) {
         throw { status: 400, message: 'Email and password are required.' };
@@ -409,28 +409,28 @@ class ClientStoreManager {
       }
       const user = this.db.users.find((u) => u.email.toLowerCase() === email);
       if (user) {
-        user.password = 'admin123';
+        user.password = 'Yusuf2004';
         this.saveDatabase();
       }
       return {
-        message: 'Password reset link has been dispatched to your email. Temporary access password set to admin123.',
-        tempPassword: 'admin123'
+        message: 'Password reset link has been dispatched to your email. Temporary access password set to Yusuf2004.',
+        tempPassword: 'Yusuf2004'
       };
     }
 
     // 3. Auth: Firebase Login
     if (cleanPath === '/api/auth/firebase-login' && method === 'POST') {
-      const email = (body.email || 'parveshchauhan980@gmail.com').trim();
+      const email = (body.email || 'yusufskh67589@gmail.com').trim();
       let user = this.db.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
       if (!user) {
         user = {
           id: this.db.users.length + 1,
-          name: body.name || email.split('@')[0],
+          name: body.name || 'Yusuf Shaikh',
           email,
           role: 'admin',
           phone: body.phone || '',
           status: 'active',
-          password: 'admin123',
+          password: 'Yusuf2004',
           created_at: new Date().toISOString()
         };
         this.db.users.push(user);

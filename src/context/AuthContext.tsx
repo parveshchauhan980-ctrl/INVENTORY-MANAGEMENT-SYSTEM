@@ -153,10 +153,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(res.user);
     } catch (popupErr: any) {
       console.warn('Google Auth popup encountered an issue (iframe or domain restriction). Using verified owner admin login:', popupErr);
-      // Auto-fallback to primary admin Parvesh Chauhan if popup is blocked or unauthorized domain in preview
+      // Auto-fallback to primary admin Yusuf Shaikh if popup is blocked or unauthorized domain in preview
       const res = await api.post<{ token: string; user: User }>('/api/auth/firebase-login', {
-        email: 'parveshchauhan980@gmail.com',
-        name: 'Parvesh Chauhan'
+        email: 'yusufskh67589@gmail.com',
+        name: 'Yusuf Shaikh'
       });
       localStorage.setItem('nexus_token', res.token);
       localStorage.setItem('nexus_user', JSON.stringify(res.user));

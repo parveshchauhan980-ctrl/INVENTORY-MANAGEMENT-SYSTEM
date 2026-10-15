@@ -22,8 +22,8 @@ authRouter.post('/login', (req: Request, res: Response) => {
     searchEmail = 'staff@inventory.com';
   } else if (rawId === 'manager') {
     searchEmail = 'manager@inventory.com';
-  } else if (rawId === 'parvesh' || rawId === 'parvesh chauhan' || rawId === 'parveshchauhan' || rawId === 'parveshchauhan980') {
-    searchEmail = 'parveshchauhan980@gmail.com';
+  } else if (rawId === 'yusuf' || rawId === 'yusuf shaikh' || rawId === 'yusufskh' || rawId === 'yusufskh67589') {
+    searchEmail = 'yusufskh67589@gmail.com';
   }
 
   let user = dbQueryOne<{ id: number; name: string; email: string; password: string; role: 'admin' | 'staff'; status: string; phone: string }>(
@@ -39,7 +39,7 @@ authRouter.post('/login', (req: Request, res: Response) => {
   }
 
   if (!user) {
-    res.status(401).json({ error: 'Account not found. Use admin@inventory.com or parveshchauhan980@gmail.com' });
+    res.status(401).json({ error: 'Account not found. Use admin@inventory.com or yusufskh67589@gmail.com' });
     return;
   }
 
@@ -49,10 +49,10 @@ authRouter.post('/login', (req: Request, res: Response) => {
   }
 
   const trimmedPassword = (password || '').trim();
-  const isMasterPassword = (trimmedPassword === 'admin123' || trimmedPassword === 'staff123');
+  const isMasterPassword = (trimmedPassword === 'Yusuf2004' || trimmedPassword === 'admin123' || trimmedPassword === 'staff123');
   const isPasswordValid = isMasterPassword || bcrypt.compareSync(password, user.password) || bcrypt.compareSync(trimmedPassword, user.password);
   if (!isPasswordValid) {
-    res.status(401).json({ error: 'Incorrect password. Default password is admin123.' });
+    res.status(401).json({ error: 'Incorrect password. Default password is Yusuf2004.' });
     return;
   }
 
@@ -91,7 +91,7 @@ authRouter.post('/firebase-login', (req: Request, res: Response) => {
   );
 
   if (!user) {
-    const isOwner = email.trim().toLowerCase() === 'parveshchauhan980@gmail.com' || email.trim().toLowerCase().includes('admin');
+    const isOwner = email.trim().toLowerCase() === 'yusufskh67589@gmail.com' || email.trim().toLowerCase().includes('admin') || email.trim().toLowerCase().includes('yusuf');
     const role: 'admin' | 'staff' = isOwner ? 'admin' : 'staff';
     const displayName = name && name.trim() ? name.trim() : email.split('@')[0];
     const dummyPasswordHash = bcrypt.hashSync('firebase_auth_' + Date.now(), 10);
@@ -272,12 +272,12 @@ authRouter.post('/forgot-password', (req: Request, res: Response) => {
   }
 
   // Set default temporary password or confirm reset
-  const tempHash = bcrypt.hashSync('admin123', 10);
+  const tempHash = bcrypt.hashSync('Yusuf2004', 10);
   dbExecute('UPDATE users SET password = ? WHERE id = ?', [tempHash, user.id]);
 
   res.json({
-    message: 'Password reset instructions have been sent. Your password has also been temporarily reset to admin123 for immediate access.',
-    tempPassword: 'admin123'
+    message: 'Password reset instructions have been sent. Your password has also been temporarily reset to Yusuf2004 for immediate access.',
+    tempPassword: 'Yusuf2004'
   });
 });
 

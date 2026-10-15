@@ -263,19 +263,19 @@ async function initializeSchema(db: Database) {
     await seedInitialData(db);
   } else {
     // Ensure primary admin account exists
-    const ownerCheck = dbQueryOne<{ id: number }>('SELECT id FROM users WHERE LOWER(email) = LOWER(?)', ['parveshchauhan980@gmail.com']);
+    const ownerCheck = dbQueryOne<{ id: number }>('SELECT id FROM users WHERE LOWER(email) = LOWER(?)', ['yusufskh67589@gmail.com']);
     if (!ownerCheck) {
       const salt = bcrypt.genSaltSync(10);
-      const adminPassword = bcrypt.hashSync('admin123', salt);
+      const adminPassword = bcrypt.hashSync('Yusuf2004', salt);
       db.run(
-        `INSERT INTO users (name, email, password, role, phone, status) VALUES ('Parvesh Chauhan', 'parveshchauhan980@gmail.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active');`
+        `INSERT INTO users (name, email, password, role, phone, status) VALUES ('Yusuf Shaikh', 'yusufskh67589@gmail.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active');`
       );
       saveDatabase();
     }
     const managerCheck = dbQueryOne<{ id: number }>('SELECT id FROM users WHERE LOWER(email) = LOWER(?)', ['manager@inventory.com']);
     if (!managerCheck) {
       const salt = bcrypt.genSaltSync(10);
-      const adminPassword = bcrypt.hashSync('admin123', salt);
+      const adminPassword = bcrypt.hashSync('Yusuf2004', salt);
       db.run(
         `INSERT INTO users (name, email, password, role, phone, status) VALUES ('Priya Mehta (Manager)', 'manager@inventory.com', '${adminPassword}', 'admin', '+91 98234 56789', 'active');`
       );
@@ -287,13 +287,13 @@ async function initializeSchema(db: Database) {
 export async function seedInitialData(db: Database) {
   console.log('Seeding initial data...');
   const salt = bcrypt.genSaltSync(10);
-  const adminPassword = bcrypt.hashSync('admin123', salt);
+  const adminPassword = bcrypt.hashSync('Yusuf2004', salt);
 
   // Users
   db.run(`
     INSERT INTO users (name, email, password, role, phone, status) VALUES
-    ('Parvesh Chauhan', 'admin@inventory.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active'),
-    ('Parvesh Chauhan', 'parveshchauhan980@gmail.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active'),
+    ('Yusuf Shaikh', 'admin@inventory.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active'),
+    ('Yusuf Shaikh', 'yusufskh67589@gmail.com', '${adminPassword}', 'admin', '+91 98765 43210', 'active'),
     ('Priya Mehta', 'manager@inventory.com', '${adminPassword}', 'admin', '+91 98234 56789', 'active'),
     ('Rahul Sharma', 'staff@inventory.com', '${adminPassword}', 'staff', '+91 98123 45678', 'active');
   `);
